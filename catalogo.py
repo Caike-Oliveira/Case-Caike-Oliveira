@@ -19,6 +19,39 @@ mcp = FastMCP(
 app = mcp.streamable_http_app()
 
 
+TIPOS_CATALOGO = {
+    "beauty": "beleza e maquiagem",
+    "fragrances": "perfumes",
+    "furniture": "móveis",
+    "groceries": "alimentos e mercearia",
+    "home-decoration": "decoração",
+    "kitchen-accessories": "utensílios de cozinha",
+    "laptops": "laptops",
+    "mens-shirts": "camisas masculinas",
+    "mens-shoes": "calçados masculinos",
+    "mens-watches": "relógios masculinos",
+    "mobile-accessories": "acessórios para celular",
+    "motorcycle": "motocicletas",
+    "skin-care": "cuidados com a pele",
+    "smartphones": "smartphones",
+    "sports-accessories": "acessórios esportivos",
+    "sunglasses": "óculos de sol",
+    "tablets": "tablets",
+    "tops": "blusas e tops",
+    "vehicle": "veículos",
+    "womens-bags": "bolsas femininas",
+    "womens-dresses": "vestidos",
+    "womens-jewellery": "joias femininas",
+    "womens-shoes": "calçados femininos",
+    "womens-watches": "relógios femininos",
+}
+
+
+class Categoria(BaseModel):
+    slug: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+
+
 class Produto(BaseModel):
     id: int = Field(gt=0)
     title: str = Field(min_length=1)
@@ -38,6 +71,23 @@ async def consultar(caminho: str, **params):
         raise ValueError("A DummyJSON demorou a responder.") from None
     except (httpx.HTTPError, ValueError):
         raise ValueError("A DummyJSON está indisponível ou retornou dados inválidos.") from None
+
+
+async def listar_categorias() -> list[dict[str, str]]:
+    dados = await consultar("/products/categories")
+    if not isinstance(dados, list):
+        raise ValueError("A DummyJSON retornou categorias inválidas.")
+    try:
+        categorias = {categoria.slug: categoria for categoria in map(Categoria.model_validate, dados)}
+    except ValidationError:
+        raise ValueError("A DummyJSON retornou categorias inválidas.") from None
+    return sorted(
+        [
+            {"slug": slug, "nome": TIPOS_CATALOGO.get(slug, categoria.name)}
+            for slug, categoria in categorias.items()
+        ],
+        key=lambda categoria: categoria["nome"].casefold(),
+    )
 
 
 @mcp.tool()

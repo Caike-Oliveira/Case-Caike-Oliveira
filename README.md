@@ -9,11 +9,11 @@ O chat transforma um pedido em linguagem natural em uma requisição de compra c
 3. Rode `docker compose up --build` e abra [http://localhost:8080](http://localhost:8080).
 4. Envie: **Preciso de 3 laptops para o time de vendas, até US$ 2.000 cada.**
 
-A API está acessível na mesma origem do chat. `POST /requisicoes` recebe `{"pedido":"..."}`. Responde 201 ao criar, 200 com `status: pendente` quando faltar algo e 5xx quando um serviço falhar. `GET /requisicoes` lista as requisições gravadas. `docker compose down` preserva os dados no volume `compras`.
+A API está acessível na mesma origem do chat. `POST /requisicoes` recebe `{"pedido":"..."}`. Responde 201 ao criar, 200 com a lista de categorias ao consultar o catálogo geral, 200 com `status: pendente` quando faltar algo e 5xx quando um serviço falhar. `GET /requisicoes` lista as requisições gravadas. `docker compose down` preserva os dados no volume `compras`.
 
 ## Simular uma compra
 
-Depois de receber o orçamento, confirme se deseja prosseguir, escolha Pix, débito, crédito ou boleto e clique em **Simular pagamento**. O Pix e o boleto exibem códigos fictícios. No crédito, escolha à vista ou de 2 a 5 parcelas sem juros. A simulação dispensa dados de cartão e não gera cobrança. Depois da confirmação, o chat oferece iniciar outro pedido na mesma conversa ou encerrar o atendimento.
+Depois de receber o orçamento, confirme se deseja prosseguir, escolha Pix, débito, crédito ou boleto e clique em **Simular pagamento**. O Pix e o boleto exibem códigos fictícios. No crédito, escolha à vista ou de 2 a 5 parcelas sem juros. A simulação dispensa dados de cartão e não gera cobrança. Depois da confirmação, o chat oferece iniciar outro pedido na mesma conversa ou encerrar o atendimento. A abertura e cada nova oferta incluem laptops e duas categorias sorteadas do catálogo. Ao pedir a lista geral, o chat mostra todas as categorias retornadas pela DummyJSON.
 
 A API registra a simulação via PUT /requisicoes/{id}/pagamento com os campos forma (pix, debito, credito ou boleto) e parcelas (1 por padrão, até 5 no crédito). Repetir a mesma confirmação retorna o registro existente. GET /requisicoes inclui o pagamento, quando houver.
 

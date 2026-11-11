@@ -12,6 +12,7 @@ from psycopg.rows import dict_row
 from pydantic import BaseModel, Field, model_validator
 
 from agente import FalhaAgente, executar
+from catalogo import listar_categorias
 
 
 async def conectar():
@@ -54,6 +55,14 @@ async def saude():
     return {"status": "ok"}
 
 
+@app.get("/catalogo/categorias")
+async def categorias_catalogo():
+    try:
+        return await listar_categorias()
+    except ValueError as erro:
+        raise HTTPException(502, str(erro)) from None
+
+
 @app.post("/requisicoes", status_code=201)
 async def criar(body: Pedido):
     pedido = body.pedido.strip()
@@ -69,6 +78,9 @@ async def criar(body: Pedido):
         raise HTTPException(erro.status, erro.mensagem) from None
 
     resultado["ferramentas"] = chamadas
+    if resultado["status"] == "catalogo":
+        resultado["categorias"] = await categorias_catalogo()
+        return JSONResponse(resultado, status_code=200)
     if resultado["status"] == "pendente":
         return JSONResponse(resultado, status_code=200)
 

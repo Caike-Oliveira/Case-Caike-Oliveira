@@ -23,6 +23,49 @@ function descricaoCredito(total, parcelas, moeda) {
     + ' + última de ' + formatar(base + resto) + ')';
 }
 
+const laptop = { slug: 'laptops', nome: 'laptops' };
+
+function sortearOfertas(categorias) {
+  const opcoes = categorias.filter(categoria => categoria.slug !== laptop.slug);
+  const ofertas = [laptop];
+  while (ofertas.length < 3 && opcoes.length > 0) {
+    const indice = Math.floor(Math.random() * opcoes.length);
+    ofertas.push(opcoes.splice(indice, 1)[0]);
+  }
+  return ofertas;
+}
+
+function Ofertas({ iniciarPedido }) {
+  const [ofertas, setOfertas] = useState([laptop]);
+
+  useEffect(() => {
+    const controle = new AbortController();
+    fetch('/catalogo/categorias', { signal: controle.signal })
+      .then(resposta => resposta.ok ? resposta.json() : [])
+      .then(categorias => {
+        if (!controle.signal.aborted) setOfertas(sortearOfertas(categorias));
+      })
+      .catch(() => {
+        // Mantém a sugestão fixa se o catálogo estiver indisponível.
+      });
+    return () => controle.abort();
+  }, []);
+
+  return (
+    <>
+      <p>Algumas opções do catálogo</p>
+      <div className="acoes-compra">
+        {ofertas.map(({ slug, nome }) => (
+          <button type="button" className="secundario" key={slug}
+            onClick={() => iniciarPedido('O que tem na categoria de ' + nome + '?')}>
+            {nome.charAt(0).toUpperCase() + nome.slice(1)}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
 function Checkout({ id, total, moeda, iniciarPedido }) {
   const [prosseguir, setProsseguir] = useState(null);
   const [forma, setForma] = useState(null);
@@ -78,17 +121,7 @@ function Checkout({ id, total, moeda, iniciarPedido }) {
               </div>
             </>
           ) : continuar ? (
-            <>
-              <p>Temos laptops, perfumes e relógios. Qual produto você procura?</p>
-              <div className="acoes-compra">
-                {['Laptops', 'Perfumes', 'Relógios'].map(produto => (
-                  <button type="button" className="secundario" key={produto}
-                    onClick={() => iniciarPedido('O que tem de ' + produto.toLowerCase() + '?')}>
-                    {produto}
-                  </button>
-                ))}
-              </div>
-            </>
+            <Ofertas iniciarPedido={iniciarPedido} />
           ) : (
             <p>Obrigado por comprar com a gente! Tenha um bom dia. Espero que volte em breve!</p>
           )}
@@ -170,6 +203,20 @@ function formatarMensagem(mensagem) {
 }
 
 function Resposta({ resposta, iniciarPedido }) {
+  if (resposta.status === 'catalogo') {
+    if (!resposta.categorias.length) return <p>O catálogo está sem categorias disponíveis no momento.</p>;
+    return (
+      <>
+        <h2>Categorias do catálogo</h2>
+        <ul className="lista-categorias">
+          {resposta.categorias.map(({ slug, nome }) => (
+            <li key={slug}>{nome.charAt(0).toUpperCase() + nome.slice(1)}</li>
+          ))}
+        </ul>
+        <p>Qual delas você gostaria de explorar?</p>
+      </>
+    );
+  }
   if (resposta.status !== 'criada') {
     return <p className="texto-resposta">{formatarMensagem(resposta.mensagem)}</p>;
   }
@@ -273,7 +320,7 @@ function App() {
         {mensagens.length === 0 && (
           <div className="inicio">
             <h2>Olá! O que você está procurando?</h2>
-            <p>No catálogo temos laptops, perfumes, relógios e outros produtos.</p>
+            <Ofertas iniciarPedido={iniciarPedido} />
           </div>
         )}
         {mensagens.map((item, i) => item.pedido
