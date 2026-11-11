@@ -23,12 +23,13 @@ function descricaoCredito(total, parcelas, moeda) {
     + ' + última de ' + formatar(base + resto) + ')';
 }
 
-function Checkout({ id, total, moeda }) {
+function Checkout({ id, total, moeda, iniciarPedido }) {
   const [prosseguir, setProsseguir] = useState(null);
   const [forma, setForma] = useState(null);
   const [parcelas, setParcelas] = useState(null);
   const [escolhendoParcelas, setEscolhendoParcelas] = useState(false);
   const [pagamento, setPagamento] = useState(null);
+  const [continuar, setContinuar] = useState(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
 
@@ -63,6 +64,34 @@ function Checkout({ id, total, moeda }) {
         <>
           <p><strong>Compra simulada concluída.</strong> Forma de pagamento: {formasPagamento[pagamento.forma]}.</p>
           {pagamento.forma === 'credito' && <p>{descricaoCredito(total, pagamento.parcelas, moeda)}</p>}
+          {continuar === null ? (
+            <>
+              <h3>Obrigado pela compra! Gostaria de mais algum produto?</h3>
+              <div className="acoes-compra">
+                <button type="button" onClick={() => {
+                  setContinuar(true);
+                  iniciarPedido('');
+                }}>Sim, quero outro produto</button>
+                <button type="button" className="secundario" onClick={() => setContinuar(false)}>
+                  Não, obrigado
+                </button>
+              </div>
+            </>
+          ) : continuar ? (
+            <>
+              <p>Temos laptops, perfumes e relógios. Qual produto você procura?</p>
+              <div className="acoes-compra">
+                {['Laptops', 'Perfumes', 'Relógios'].map(produto => (
+                  <button type="button" className="secundario" key={produto}
+                    onClick={() => iniciarPedido('O que tem de ' + produto.toLowerCase() + '?')}>
+                    {produto}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p>Obrigado por comprar com a gente! Tenha um bom dia. Espero que volte em breve!</p>
+          )}
         </>
       ) : prosseguir === false ? (
         <p>Tudo bem. Sinto muito por não poder ajudar com a compra desta vez. Se precisar de outro orçamento, estou à disposição.</p>
@@ -140,7 +169,7 @@ function formatarMensagem(mensagem) {
   return mensagem;
 }
 
-function Resposta({ resposta }) {
+function Resposta({ resposta, iniciarPedido }) {
   if (resposta.status !== 'criada') {
     return <p className="texto-resposta">{formatarMensagem(resposta.mensagem)}</p>;
   }
@@ -175,7 +204,7 @@ function Resposta({ resposta }) {
           <ul>{resposta.ferramentas.map((nome, i) => <li key={i}><code>{nome}</code></li>)}</ul>
         </details>
       )}
-      <Checkout id={resposta.id} total={resposta.total} moeda={moeda} />
+      <Checkout id={resposta.id} total={resposta.total} moeda={moeda} iniciarPedido={iniciarPedido} />
     </>
   );
 }
@@ -186,10 +215,17 @@ function App() {
   const [contexto, setContexto] = useState([]);
   const [enviando, setEnviando] = useState(false);
   const fim = useRef(null);
+  const campo = useRef(null);
 
   useEffect(() => {
     if (mensagens.length) fim.current?.scrollIntoView({ block: 'nearest' });
   }, [mensagens, enviando]);
+
+  function iniciarPedido(texto) {
+    setContexto([]);
+    if (texto) setPedido(texto);
+    campo.current?.focus();
+  }
 
   async function enviar(event) {
     event.preventDefault();
@@ -242,7 +278,7 @@ function App() {
         )}
         {mensagens.map((item, i) => item.pedido
           ? <p className="pedido" key={i}>{item.pedido}</p>
-          : <article className="resposta" key={i}><Resposta resposta={item.resposta} /></article>
+          : <article className="resposta" key={i}><Resposta resposta={item.resposta} iniciarPedido={iniciarPedido} /></article>
         )}
         {enviando && <p className="status" role="status">Consultando o catálogo…</p>}
         <div ref={fim} />
@@ -250,7 +286,7 @@ function App() {
       <form onSubmit={enviar}>
         <label htmlFor="pedido">Seu pedido</label>
         <div className="entrada">
-          <textarea id="pedido" rows={2} maxLength={3000} value={pedido}
+          <textarea id="pedido" ref={campo} rows={2} maxLength={3000} value={pedido}
             onChange={event => setPedido(event.target.value)}
             onKeyDown={event => {
               if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing || event.keyCode === 229) return;

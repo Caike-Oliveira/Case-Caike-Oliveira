@@ -13,7 +13,7 @@ A API está acessível na mesma origem do chat. `POST /requisicoes` recebe `{"pe
 
 ## Simular uma compra
 
-Depois de receber o orçamento, confirme se deseja prosseguir, escolha Pix, débito, crédito ou boleto e clique em **Simular pagamento**. O Pix e o boleto exibem códigos fictícios. No crédito, escolha à vista ou de 2 a 5 parcelas sem juros. A simulação dispensa dados de cartão e não gera cobrança.
+Depois de receber o orçamento, confirme se deseja prosseguir, escolha Pix, débito, crédito ou boleto e clique em **Simular pagamento**. O Pix e o boleto exibem códigos fictícios. No crédito, escolha à vista ou de 2 a 5 parcelas sem juros. A simulação dispensa dados de cartão e não gera cobrança. Depois da confirmação, o chat oferece iniciar outro pedido na mesma conversa ou encerrar o atendimento.
 
 A API registra a simulação via PUT /requisicoes/{id}/pagamento com os campos forma (pix, debito, credito ou boleto) e parcelas (1 por padrão, até 5 no crédito). Repetir a mesma confirmação retorna o registro existente. GET /requisicoes inclui o pagamento, quando houver.
 
