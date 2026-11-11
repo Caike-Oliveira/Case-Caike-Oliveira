@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: "DM Sans", sans-serif;
+  color: #16271d;
+  background: #f2f5f1;
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { width: min(860px, 100%); margin: auto; padding: 28px clamp(14px, 4vw, 38px); }
+header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.marca { border-radius: 12px; background: #224a33; color: white; padding: 5px 13px; font-size: 23px; }
+h1 { font-size: 21px; margin: 0; }
+h2 { margin: 0 0 12px; }
+p { margin: 0; }
+.historico {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: min(52vh, 450px);
+  max-height: 62vh;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #dce4da;
+  border-radius: 20px;
+  padding: clamp(12px, 4vw, 26px);
+}
+.inicio { margin: auto; width: min(100%, 490px); padding-block: 24px; }
+.inicio h2 { font-size: clamp(24px, 5vw, 36px); line-height: 1.1; letter-spacing: -.035em; }
+.inicio p, .status { color: #4b5e51; }
+button, textarea { font: inherit; }
+button { cursor: pointer; }
+.exemplo { margin-top: 18px; padding: 12px 16px; text-align: left; color: #224a33; background: #f2f5f1; border: 1px solid #dce4da; border-radius: 12px; }
+.pedido, .resposta { padding: 14px; border-radius: 14px; overflow-wrap: anywhere; }
+.pedido { align-self: end; max-width: 90%; background: #224a33; color: white; white-space: pre-wrap; }
+.resposta { align-self: stretch; background: #f2f5f1; }
+.resposta h2 { font-size: 18px; }
+.tabela { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+th, td { padding: 8px; border-bottom: 1px solid #dce4da; }
+td { white-space: nowrap; text-align: right; }
+thead th:not(:first-child) { text-align: right; }
+tfoot { font-weight: 700; }
+details { margin-top: 12px; font-size: 13px; }
+summary { cursor: pointer; }
+form { margin-top: 16px; }
+label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 700; }
+.entrada { display: flex; align-items: stretch; gap: 8px; }
+textarea { min-width: 0; flex: 1; padding: 12px; border: 1px solid #b9c7ba; border-radius: 12px; resize: vertical; }
+form button { padding: 0 16px; border: 0; border-radius: 12px; color: white; background: #224a33; }
+form button:disabled { cursor: default; opacity: .55; }
+:focus-visible { outline: 2px solid #326844; outline-offset: 3px; }
