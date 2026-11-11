@@ -15,3 +15,13 @@ CREATE TABLE IF NOT EXISTS requisicao_itens (
     subtotal numeric(20, 2) GENERATED ALWAYS AS (quantidade * preco_unitario) STORED,
     PRIMARY KEY (requisicao_id, produto_id)
 );
+
+CREATE TABLE IF NOT EXISTS pagamentos_simulados (
+    requisicao_id bigint PRIMARY KEY REFERENCES requisicoes(id) ON DELETE CASCADE,
+    forma text NOT NULL CHECK (forma IN ('pix', 'debito', 'credito', 'boleto')),
+    registrado_em timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE pagamentos_simulados
+    ADD COLUMN IF NOT EXISTS parcelas smallint NOT NULL DEFAULT 1
+    CHECK (parcelas BETWEEN 1 AND 5 AND (forma = 'credito' OR parcelas = 1));

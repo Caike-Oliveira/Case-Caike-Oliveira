@@ -31,11 +31,11 @@ p { margin: 0; }
 .inicio p, .status { color: #4b5e51; }
 button, textarea { font: inherit; }
 button { cursor: pointer; }
-.exemplo { margin-top: 18px; padding: 12px 16px; text-align: left; color: #224a33; background: #f2f5f1; border: 1px solid #dce4da; border-radius: 12px; }
 .pedido, .resposta { padding: 14px; border-radius: 14px; overflow-wrap: anywhere; }
 .pedido { align-self: end; max-width: 90%; background: #224a33; color: white; white-space: pre-wrap; }
 .resposta { align-self: stretch; background: #f2f5f1; }
 .resposta h2 { font-size: 18px; }
+.texto-resposta { white-space: pre-line; }
 .tabela { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
 th, td { padding: 8px; border-bottom: 1px solid #dce4da; }
@@ -51,3 +51,18 @@ textarea { min-width: 0; flex: 1; padding: 12px; border: 1px solid #b9c7ba; bord
 form button { padding: 0 16px; border: 0; border-radius: 12px; color: white; background: #224a33; }
 form button:disabled { cursor: default; opacity: .55; }
 :focus-visible { outline: 2px solid #326844; outline-offset: 3px; }
+
+.checkout { margin-top: 16px; padding-top: 14px; border-top: 1px solid #dce4da; }
+.checkout h3 { font-size: 16px; margin: 0 0 8px; }
+.checkout p + p { margin-top: 6px; }
+.acoes-compra { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.acoes-compra button {
+  padding: 8px 12px;
+  border: 1px solid #224a33;
+  border-radius: 9px;
+  color: white;
+  background: #224a33;
+}
+.acoes-compra .secundario { color: #224a33; background: transparent; }
+.acoes-compra button:disabled { opacity: .55; cursor: wait; }
+.erro-pagamento { color: #8f231f; margin-top: 8px; }
